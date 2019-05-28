@@ -4,6 +4,14 @@ import org.scalameter.api._
 
 object PBWriterBenchmark extends Bench.LocalTime {
 
+  /////////////////////////////////////////////////////////////////////////////
+  // The following microbenchmarking tests a very specific scenario: A deeply-
+  // nested case class or tuple contains a payload of bytes at the end.
+  // Here we are specifically interested in how serialization performance
+  // scales with the depth of the payload.  (Ideally it wouldn't matter much
+  // how deep it is, but see https://github.com/btlines/pbdirect/issues/39.)
+  /////////////////////////////////////////////////////////////////////////////
+  
   private def make5DeepTuple[V](rootValue: V): Tuple1[Tuple1[Tuple1[Tuple1[Tuple1[V]]]]] = {
     Tuple1(Tuple1(Tuple1(Tuple1(Tuple1(rootValue)))))
   }
