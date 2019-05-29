@@ -53,17 +53,16 @@ trait LowPriorityPBWriterImplicits {
   implicit def prodWriter[A, R <: HList](implicit gen: Generic.Aux[A, R], writer: Lazy[PBWriter[R]]): PBWriter[A] =
     instance(
       { (index: Int, value: A, out: CodedOutputStream, sizes: SizeMap) =>
-        
         val valueAsHList = gen.to(value)
-        val size = writer.value.writtenBytesSize(index, valueAsHList, sizes)
+        val size = writer.value.writtenBytesSize(1, valueAsHList, sizes)
         out.writeTag(index, WireFormat.WIRETYPE_LENGTH_DELIMITED)
         out.writeUInt32NoTag(size)
         writer.value.writeTo(1, valueAsHList, out, sizes)
       },
-      LowPriorityPBWriterImplicits.memoize({ (index: Int, value: A, sizes: SizeMap) =>
+      LowPriorityPBWriterImplicits.memoize { (index: Int, value: A, sizes: SizeMap) =>
         val bytesSize = writer.value.writtenBytesSize(1, gen.to(value), sizes)
         CodedOutputStream.computeTagSize(index) + CodedOutputStream.computeUInt32SizeNoTag(bytesSize) + bytesSize
-      })
+      }
     )
 
   implicit val cnilWriter: PBWriter[CNil] = instance(
