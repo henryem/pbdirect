@@ -1,5 +1,7 @@
 package pbdirect
 
+import java.io.ByteArrayOutputStream
+
 import cats.{Contravariant, Functor}
 import com.google.protobuf.{CodedOutputStream, WireFormat}
 import pbdirect.LowPriorityPBWriterImplicits.SizeMap
@@ -51,6 +53,7 @@ trait LowPriorityPBWriterImplicits {
   implicit def prodWriter[A, R <: HList](implicit gen: Generic.Aux[A, R], writer: Lazy[PBWriter[R]]): PBWriter[A] =
     instance(
       { (index: Int, value: A, out: CodedOutputStream, sizes: SizeMap) =>
+        
         val valueAsHList = gen.to(value)
         val size = writer.value.writtenBytesSize(index, valueAsHList, sizes)
         out.writeTag(index, WireFormat.WIRETYPE_LENGTH_DELIMITED)
