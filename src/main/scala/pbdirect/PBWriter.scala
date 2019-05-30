@@ -1,7 +1,5 @@
 package pbdirect
 
-import java.io.ByteArrayOutputStream
-
 import cats.{Contravariant, Functor}
 import com.google.protobuf.{CodedOutputStream, WireFormat}
 import pbdirect.LowPriorityPBWriterImplicits.SizeMap
@@ -159,9 +157,6 @@ trait PBWriterImplicits extends LowPriorityPBWriterImplicits {
         ()
       },
       { (index: Int, value: F[A], sizes: SizeMap) =>
-        //NOTE: This recomputes the mapping, and may not work for arbitrary
-        // functors.  It may be necessary to instead write out the value in
-        // a dummy buffer just to see how large it is.
         var total = 0
         functor.map(value) { v => total += writer.writtenBytesSize(index, v, sizes) }
         total

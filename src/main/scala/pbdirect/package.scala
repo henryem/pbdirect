@@ -8,7 +8,6 @@ package object pbdirect {
     def toPB(implicit writer: PBWriter[A]): Array[Byte] = {
       val out = new ByteArrayOutputStream()
       val pbOut = CodedOutputStream.newInstance(out)
-      //FIXME: Figure out a reasonable starting size.
       val sizes = new util.IdentityHashMap[Any, Int]()
       writer.writeTo(1, a, pbOut, sizes)
       pbOut.flush()
