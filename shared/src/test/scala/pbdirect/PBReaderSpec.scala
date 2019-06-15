@@ -79,6 +79,11 @@ class PBReaderSpec extends WordSpecLike with Matchers {
       val bytes = Array[Byte]()
       bytes.pbTo[EmptyMessage] shouldBe EmptyMessage()
     }
+    "read a message with single missing field from Protobuf" in {
+      case class MissingMessage(text: Option[String])
+      val bytes = Array[Byte]()
+      bytes.pbTo[MissingMessage] shouldBe MissingMessage(None)
+    }
     "read a multi-field message from Protobuf" in {
       case class MultiMessage(text: Option[String], number: Option[Int])
       val bytes = Array[Byte](10, 5, 72, 101, 108, 108, 111, 16, 3)
@@ -124,6 +129,16 @@ class PBReaderSpec extends WordSpecLike with Matchers {
       intBytes.pbTo[Message] shouldBe IntMessage(Some(5))
       stringBytes.pbTo[Message] shouldBe StringMessage(Some("Hello"))
     }
+    "read a nested sealed trait from Protobuf" in {
+      sealed trait Message
+      case class IntMessage(value: Option[Int]) extends Message
+      case class StringMessage(value: Option[String]) extends Message
+      case class NestedMessage(value: Message)
+      val intBytes = Array[Byte](10, 2, 8, 5)
+      intBytes.pbTo[NestedMessage] shouldBe NestedMessage(IntMessage(Some(5)))
+      val stringBytes = Array[Byte](10, 7, 10, 5, 72, 101, 108, 108, 111)
+      stringBytes.pbTo[NestedMessage] shouldBe NestedMessage(StringMessage(Some("Hello")))
+    }
     "read a sealed trait with same repr from Protobuf" in {
       sealed trait Message
       case class M1(@Index(1) value: Int) extends Message
@@ -142,6 +157,13 @@ class PBReaderSpec extends WordSpecLike with Matchers {
       val bytes = Array[Byte](10, 37, 10, 6, 109, 101, 116, 114, 105, 99, 18, 13, 109, 105, 99, 114, 111, 115, 101, 114,
         118, 105, 99, 101, 115, 26, 4, 110, 111, 100, 101, 37, 0, 0, 64, 65, 40, -71, 96)
       bytes.pbTo[Metrics] shouldBe message
+    }
+    "read a message with nested repeated message from Protobuf" in {
+      case class ListOfLists(v: List[ListOfInt])
+      case class ListOfInt(v: List[Int])
+      val message = ListOfLists(List(ListOfInt(List(1, 2)), ListOfInt(List(3, 4))))
+      val bytes = Array[Byte](10, 4, 8, 1, 8, 2, 10, 4, 8, 3, 8, 4)
+      bytes.pbTo[ListOfLists] shouldBe message
     }
     "read a message with many fields from Protobuf" in {
       case class Message(
