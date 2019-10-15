@@ -104,6 +104,11 @@ class PBWriterSpec extends WordSpecLike with Matchers {
       val message = RepeatedMessage(Seq(1, 2, 3, 4))
       message.toPB shouldBe Array[Byte](8, 1, 8, 2, 8, 3, 8, 4)
     }
+    "write a message with IndexedSeq to Protobuf" in {
+      case class RepeatedMessage(values: IndexedSeq[Int])
+      val message = RepeatedMessage(IndexedSeq(1, 2, 3, 4))
+      message.toPB shouldBe Array[Byte](8, 1, 8, 2, 8, 3, 8, 4)
+    }
     "write a Map to Protobuf" in {
       case class MapMessage(values: Map[Int, String])
       val message = MapMessage(Map(1 -> "one", 2 -> "two"))

@@ -104,6 +104,11 @@ class PBReaderSpec extends WordSpecLike with Matchers {
       val bytes = Array[Byte](8, 1, 8, 2, 8, 3, 8, 4)
       bytes.pbTo[RepeatedMessage] shouldBe RepeatedMessage(Seq(1, 2, 3, 4))
     }
+    "read a message with IndexedSeq from Protobuf" in {
+      case class RepeatedMessage(values: IndexedSeq[Int])
+      val bytes = Array[Byte](8, 1, 8, 2, 8, 3, 8, 4)
+      bytes.pbTo[RepeatedMessage] shouldBe RepeatedMessage(IndexedSeq(1, 2, 3, 4))
+    }
     "read a Map from Protobuf" in {
       case class MapMessage(values: Map[Int, String])
       val bytes = Array[Byte](10, 7, 8, 1, 18, 3, 111, 110, 101, 10, 7, 8, 2, 18, 3, 116, 119, 111)
