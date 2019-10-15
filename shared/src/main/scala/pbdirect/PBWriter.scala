@@ -693,6 +693,15 @@ trait PBWriterImplicits extends PBConsWriter16 {
       writer.writtenBytesSize(index, value.toList, sizes)
     }
     )
+  implicit def indexedSeqWriter[A](implicit writer: PBWriter[List[A]]): PBWriter[IndexedSeq[A]] =
+    instance(
+    { (index: NEL[Int], value: Seq[A], out: CodedOutputStream, sizes: SizeWithoutTag) =>
+      writer.writeTo(index, value.toList, out, sizes)
+    },
+    { (index: NEL[Int], value: Seq[A], sizes: SizeWithoutTag) =>
+      writer.writtenBytesSize(index, value.toList, sizes)
+    }
+    )
   implicit def enumWriter[E](implicit values: Enum.Values[E], ordering: Ordering[E]): PBWriter[E] =
     instance(
     { (index: NEL[Int], value: E, out: CodedOutputStream, sizes: SizeWithoutTag) =>

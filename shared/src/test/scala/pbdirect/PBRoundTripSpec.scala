@@ -80,6 +80,11 @@ class PBRoundTripSpec extends WordSpecLike with Matchers {
       val value = NestedMessage(List(1, 2, 3, 4))
       value.toPB.pbTo[NestedMessage[List[Int]]] shouldBe value
     }
+
+    "preserve an IndexedSeq" in {
+      val value = NestedMessage[IndexedSeq[Int]](Vector(1, 2, 3, 4))
+      value.toPB.pbTo[NestedMessage[IndexedSeq[Int]]] shouldBe value
+    }
   
     "preserve an empty list" in {
       val value = NestedMessage[List[Int]](Nil)
@@ -100,7 +105,7 @@ class PBRoundTripSpec extends WordSpecLike with Matchers {
       val value = NestedMessage(List(NestedMessage(1), NestedMessage(2)))
       value.toPB.pbTo[NestedMessage[List[NestedMessage[Int]]]] shouldBe value
     }
-  
+
     "preserve a wrapper(list(wrapper(int, string)), string)" in {
       val value = NestedMultiMessage(List(NestedMultiMessage(1, "foo"), NestedMultiMessage(2, "bar")), "garply")
       value.toPB.pbTo[NestedMultiMessage[List[NestedMultiMessage[Int, String]], String]] shouldBe value
